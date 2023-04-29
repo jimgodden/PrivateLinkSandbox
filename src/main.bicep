@@ -172,11 +172,13 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' =
     type: 'CustomScriptExtension'
     typeHandlerVersion: '1.9'
     autoUpgradeMinorVersion: true
-    protectedSettings: {
+    settings: {
       fileUris: [
         'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1'
       ]
-      commandToExecute: 'powershell.exe sourceInitScript.ps1'
+    }
+    protectedSettings: {
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1'
     }
   }
 }
@@ -425,29 +427,14 @@ resource privateendpoint 'Microsoft.Network/privateEndpoints@2022-09-01' = {
         name: privateendpoint_name
         properties: {
           privateLinkServiceId: privateLink.id
-          // groupIds: []
-          // privateLinkServiceConnectionState: {
-          //   description: 'Auto Approved'
-          //   actionsRequired: 'None'
-          // }
         }
       }
     ]
     manualPrivateLinkServiceConnections: []
     customNetworkInterfaceName: '${privateendpoint_name}-nic'
     subnet: {
-      id: source_vnet_subnet_default.id
+      id: source_vnet_subnet_pe.id
     }
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          privateIPAddress: '10.1.0.10'
-      
-        }
-      }
-    ]
-    customDnsConfigs: []
   }
 }
 
@@ -455,13 +442,6 @@ resource privateLink 'Microsoft.Network/privateLinkServices@2022-09-01' = {
   name: privatelink_name
   location: location
   properties: {
-    fqdns: []
-    visibility: {
-      subscriptions: []
-    }
-    autoApproval: {
-      subscriptions: []
-    }
     enableProxyProtocol: false
     loadBalancerFrontendIpConfigurations: [
       {
@@ -502,9 +482,6 @@ resource privatelink_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
         }
       }
     ]
-    dnsSettings: {
-      dnsServers: []
-    }
     enableAcceleratedNetworking: false
     enableIPForwarding: false
     disableTcpStateTracking: false
@@ -522,11 +499,11 @@ resource vnet_peering_src_to_dst 'Microsoft.Network/virtualNetworks/virtualNetwo
     remoteVirtualNetwork: {
       id: destination_vnet.id
     }
-    allowVirtualNetworkAccess: true
-    allowForwardedTraffic: true
-    allowGatewayTransit: false
-    useRemoteGateways: false
-    doNotVerifyRemoteGateways: false
+    // allowVirtualNetworkAccess: true
+    // allowForwardedTraffic: true
+    // allowGatewayTransit: false
+    // useRemoteGateways: false
+    // doNotVerifyRemoteGateways: false
     
   }
   dependsOn: [
@@ -564,6 +541,16 @@ resource source_vnet_subnet_bastion 'Microsoft.Network/virtualNetworks/subnets@2
     addressPrefix: '10.1.1.0/24'
     serviceEndpoints: []
     delegations: []
+    privateEndpointNetworkPolicies: 'Disabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
+  }
+}
+
+resource source_vnet_subnet_pe 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' = {
+  parent: source_vnet
+  name: 'peSubnet'
+  properties: {
+    addressPrefix: '10.1.2.0/24'
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
   }

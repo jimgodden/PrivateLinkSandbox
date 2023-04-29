@@ -8,7 +8,8 @@ while ($noError) {
     $date = Get-Date
     Write-Host "Attempt #${attempt} at ${date}"
     try {
-        $response = Invoke-WebRequest -uri "https://10.1.0.10:10001/" -SkipCertificateCheck -TimeoutSec 10
+        # 10.1.2.4 is the IP of the Private Endpoint
+        $response = Invoke-WebRequest -uri "https://10.1.2.4:10001/" -SkipCertificateCheck -TimeoutSec 10
         if ($response.StatusCode -eq 200) {
             Write-Host "Success"
         }
