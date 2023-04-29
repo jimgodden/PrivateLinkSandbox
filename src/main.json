@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.4.1272.37030",
-      "templateHash": "5831121084341657222"
+      "version": "0.10.61.36676",
+      "templateHash": "6198132225875598227"
     }
   },
   "parameters": {
@@ -53,6 +53,10 @@
     "destination_nic_name": {
       "type": "string",
       "defaultValue": "destinationVM_nic"
+    },
+    "publicIpAddress_destination_name": {
+      "type": "string",
+      "defaultValue": "destinationVM_VIP"
     },
     "privateendpoint_name": {
       "type": "string",
@@ -138,6 +142,80 @@
       ]
     },
     {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('destination_nic_name')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]"
+              },
+              "primary": true,
+              "privateIPAddressVersion": "IPv4",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress_destination_name'))]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('slb_name'), 'bep')]"
+                }
+              ]
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": []
+        },
+        "enableAcceleratedNetworking": true,
+        "enableIPForwarding": false,
+        "disableTcpStateTracking": false,
+        "nicType": "Standard"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress_destination_name'))]",
+        "[resourceId('Microsoft.Network/loadBalancers', parameters('slb_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('publicIpAddress_destination_name')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscriptdst')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "install software for Windows VM"
+      },
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.9",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/destinationInitScript.ps1"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File destinationInitScript.ps1"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2022-11-01",
       "name": "[parameters('source_vm_name')]",
@@ -207,32 +285,6 @@
       ]
     },
     {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2021-11-01",
-      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscript')]",
-      "location": "[parameters('location')]",
-      "tags": {
-        "displayName": "install software for Windows VM"
-      },
-      "properties": {
-        "publisher": "Microsoft.Compute",
-        "type": "CustomScriptExtension",
-        "typeHandlerVersion": "1.9",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": [
-            "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1"
-          ]
-        },
-        "protectedSettings": {
-          "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1"
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
-      ]
-    },
-    {
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2022-09-01",
       "name": "[parameters('source_nic_name')]",
@@ -262,6 +314,32 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscriptsrc')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "install software for Windows VM"
+      },
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.9",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
       ]
     },
     {
@@ -387,44 +465,6 @@
       ]
     },
     {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2022-09-01",
-      "name": "[parameters('destination_nic_name')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]"
-              },
-              "primary": true,
-              "privateIPAddressVersion": "IPv4",
-              "loadBalancerBackendAddressPools": [
-                {
-                  "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('slb_name'), 'bep')]"
-                }
-              ]
-            }
-          }
-        ],
-        "dnsSettings": {
-          "dnsServers": []
-        },
-        "enableAcceleratedNetworking": true,
-        "enableIPForwarding": false,
-        "disableTcpStateTracking": false,
-        "nicType": "Standard"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]",
-        "[resourceId('Microsoft.Network/loadBalancers', parameters('slb_name'))]"
-      ]
-    },
-    {
       "type": "Microsoft.Network/privateEndpoints",
       "apiVersion": "2022-09-01",
       "name": "[parameters('privateendpoint_name')]",
@@ -478,21 +518,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]",
         "[resourceId('Microsoft.Network/loadBalancers', parameters('slb_name'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "apiVersion": "2022-09-01",
-      "name": "[format('{0}/{1}', parameters('source_vnet_name'), 'todst')]",
-      "properties": {
-        "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('destination_vnet_name'))]"
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/bastionHosts', parameters('bastion_name'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('destination_vnet_name'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]"
       ]
     },
     {
@@ -553,6 +578,21 @@
       ]
     },
     {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/{1}', parameters('source_vnet_name'), 'todst')]",
+      "properties": {
+        "remoteVirtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('destination_vnet_name'))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/bastionHosts', parameters('bastion_name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('destination_vnet_name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2022-09-01",
       "name": "[parameters('destination_vnet_name')]",
@@ -587,12 +627,7 @@
       "properties": {
         "remoteVirtualNetwork": {
           "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]"
-        },
-        "allowVirtualNetworkAccess": true,
-        "allowForwardedTraffic": true,
-        "allowGatewayTransit": false,
-        "useRemoteGateways": false,
-        "doNotVerifyRemoteGateways": false
+        }
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/bastionHosts', parameters('bastion_name'))]",
