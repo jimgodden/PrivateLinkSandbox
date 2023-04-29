@@ -45,7 +45,7 @@ resource destination_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
       }
       osDisk: {
         osType: 'Windows'
-        name: '${destination_vm_name}_OsDisk_1_d42911ea18c44a65beb488855faa0e57'
+        name: '${destination_vm_name}_OsDisk_1'
         createOption: 'FromImage'
         caching: 'ReadWrite'
         managedDisk: {
@@ -56,7 +56,7 @@ resource destination_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
         diskSizeGB: 127
       }
       dataDisks: []
-      diskControllerType: 'SCSI'
+      // diskControllerType: 'SCSI'
     }
     osProfile: {
       computerName: destination_vm_name
@@ -112,7 +112,7 @@ resource source_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
       }
       osDisk: {
         osType: 'Windows'
-        name: '${source_vm_name}_OsDisk_1_1367f1ccf4264ee789372a21344c941a'
+        name: '${source_vm_name}_OsDisk_1'
         createOption: 'FromImage'
         caching: 'ReadWrite'
         managedDisk: {
@@ -123,7 +123,7 @@ resource source_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
         diskSizeGB: 127
       }
       dataDisks: []
-      diskControllerType: 'SCSI'
+      // diskControllerType: 'SCSI'
     }
     osProfile: {
       computerName: source_vm_name
