@@ -160,6 +160,27 @@ resource source_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
 }
 
+resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+  parent: source_vm
+  name: 'installcustomscript'
+  location: location
+  tags: {
+    displayName: 'install software for Windows VM'
+  }
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.9'
+    autoUpgradeMinorVersion: true
+    protectedSettings: {
+      fileUris: [
+        
+      ]
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted Install-WindowsFeature -Name Web-Server ` '
+    }
+  }
+}
+
 resource privateendpoint_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
   name: privateendpoint_nic_name
   location: location
