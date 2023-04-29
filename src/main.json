@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.10.61.36676",
-      "templateHash": "8841751159427647368"
+      "templateHash": "7503443475965707956"
     }
   },
   "parameters": {
@@ -190,12 +190,15 @@
       "location": "[parameters('location')]",
       "sku": {
         "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static"
       }
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "2021-11-01",
-      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscriptdst')]",
+      "name": "[format('{0}/{1}', parameters('destination_vm_name'), 'installcustomscript')]",
       "location": "[parameters('location')]",
       "tags": {
         "displayName": "install software for Windows VM"
@@ -215,7 +218,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('destination_vm_name'))]"
       ]
     },
     {
@@ -322,7 +325,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "2021-11-01",
-      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscriptsrc')]",
+      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscript')]",
       "location": "[parameters('location')]",
       "tags": {
         "displayName": "install software for Windows VM"

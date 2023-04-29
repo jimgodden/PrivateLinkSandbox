@@ -137,11 +137,14 @@ resource publicIpAddress_destination 'Microsoft.Network/publicIPAddresses@2022-0
   sku: {
     name: 'Standard'
   }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
 }
 
 resource vmExtension_destination 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
-  parent: source_vm
-  name: 'installcustomscriptdst'
+  parent: destination_vm
+  name: 'installcustomscript'
   location: location
   tags: {
     displayName: 'install software for Windows VM'
@@ -259,7 +262,7 @@ resource source_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
 
 resource vmExtension_source 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
   parent: source_vm
-  name: 'installcustomscriptsrc'
+  name: 'installcustomscript'
   location: location
   tags: {
     displayName: 'install software for Windows VM'
