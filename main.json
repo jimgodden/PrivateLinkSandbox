@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.1272.37030",
-      "templateHash": "7873652320568982335"
+      "templateHash": "15604517799950167290"
     }
   },
   "parameters": {
@@ -449,13 +449,7 @@
           {
             "name": "[parameters('privateendpoint_name')]",
             "properties": {
-              "privateLinkServiceId": "[resourceId('Microsoft.Network/privateLinkServices', parameters('privatelink_name'))]",
-              "groupIds": [],
-              "privateLinkServiceConnectionState": {
-                "status": "Approved",
-                "description": "Auto Approved",
-                "actionsRequired": "None"
-              }
+              "privateLinkServiceId": "[resourceId('Microsoft.Network/privateLinkServices', parameters('privatelink_name'))]"
             }
           }
         ],
@@ -464,7 +458,14 @@
         "subnet": {
           "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
         },
-        "ipConfigurations": [],
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.1.0.10"
+            }
+          }
+        ],
         "customDnsConfigs": []
       },
       "dependsOn": [

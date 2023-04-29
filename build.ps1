@@ -1,0 +1,1 @@
+bicep.exe build .\main.bicep

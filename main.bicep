@@ -404,12 +404,11 @@ resource privateendpoint 'Microsoft.Network/privateEndpoints@2022-09-01' = {
         name: privateendpoint_name
         properties: {
           privateLinkServiceId: privateLink.id
-          groupIds: []
-          privateLinkServiceConnectionState: {
-            status: 'Approved'
-            description: 'Auto Approved'
-            actionsRequired: 'None'
-          }
+          // groupIds: []
+          // privateLinkServiceConnectionState: {
+          //   description: 'Auto Approved'
+          //   actionsRequired: 'None'
+          // }
         }
       }
     ]
@@ -418,7 +417,15 @@ resource privateendpoint 'Microsoft.Network/privateEndpoints@2022-09-01' = {
     subnet: {
       id: source_vnet_subnet_default.id
     }
-    ipConfigurations: []
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          privateIPAddress: '10.1.0.10'
+      
+        }
+      }
+    ]
     customDnsConfigs: []
   }
 }
