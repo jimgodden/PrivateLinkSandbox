@@ -6,7 +6,8 @@ $currentTime = Get-Date -Format "HH:mm K"
 Write-Host "Starting Bicep Deployment.  Process began at: ${currentTime}"
 
 # Specifies the account and subscription where the deployment will take place.
-Set-AzContext -Subscription "a2c8e9b2-b8d3-4f38-8a72-642d0012c518"
+# Specify the Subscription ID for the subscription you want to deploy this lab
+Set-AzContext -Subscription $subID
 
 $iteration = 1
 $rgLocation = "westeurope"
