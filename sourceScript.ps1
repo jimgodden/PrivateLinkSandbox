@@ -29,5 +29,5 @@ while ($noError) {
         Write-Host "Timeout error occurred on ${date}"
         $noError = $false
     }
-    Start-Sleep -Seconds 1
+    #Start-Sleep -Seconds 1
 }
