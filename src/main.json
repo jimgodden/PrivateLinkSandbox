@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.1272.37030",
-      "templateHash": "11604671144836954342"
+      "templateHash": "13534265367586833928"
     }
   },
   "parameters": {
@@ -575,7 +575,8 @@
         "privateLinkServiceNetworkPolicies": "Enabled"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
       ]
     },
     {
@@ -588,7 +589,8 @@
         "privateLinkServiceNetworkPolicies": "Enabled"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('source_vnet_name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'AzureBastionSubnet')]"
       ]
     },
     {

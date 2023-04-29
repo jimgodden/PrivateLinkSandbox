@@ -544,6 +544,9 @@ resource source_vnet_subnet_bastion 'Microsoft.Network/virtualNetworks/subnets@2
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
   }
+  dependsOn: [
+    source_vnet_subnet_default
+  ]
 }
 
 resource source_vnet_subnet_pe 'Microsoft.Network/virtualNetworks/subnets@2022-09-01' = {
@@ -554,6 +557,9 @@ resource source_vnet_subnet_pe 'Microsoft.Network/virtualNetworks/subnets@2022-0
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
   }
+  dependsOn: [
+    source_vnet_subnet_bastion
+  ]
 }
 
 resource destination_vnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
