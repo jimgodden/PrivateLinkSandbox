@@ -18,6 +18,10 @@ while ($noError) {
         $date = Get-Date
         Write-Host "Timeout error occurred on ${date}"
         $noError = $false
+
+        Write-Host "Downloading Wireshark to capture packets and catch the next occurrance.."
+        Invoke-WebRequest -Uri https://2.na.dl.wireshark.org/win64/Wireshark-win64-4.0.5.exe -OutFile Wireshark-win64-4.0.5.exe
+        Wireshark-win64-4.0.5.exe
     }
     #Start-Sleep -Seconds 1
 }

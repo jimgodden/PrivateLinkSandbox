@@ -16,6 +16,7 @@ param source_nic_name string = 'sourceVM_nic'
 
 param destination_vm_name string = 'destinationVM${iteration}'
 param destination_nic_name string = 'destinationVM_nic'
+param publicIpAddress_destination_name string = 'destinationVM_VIP'
 
 param privateendpoint_name string = 'PE'
 
@@ -91,6 +92,73 @@ resource destination_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
 }
 
+resource destination_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
+  name: destination_nic_name
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: destination_vnet_subnet_default.id
+          }
+          primary: true
+          privateIPAddressVersion: 'IPv4'
+          publicIPAddress: {
+            id: publicIpAddress_destination.id
+          }
+          loadBalancerBackendAddressPools: [
+            {
+              id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', slb_name, 'bep')
+            }
+          ]
+        }
+      }
+    ]
+    dnsSettings: {
+      dnsServers: []
+    }
+    enableAcceleratedNetworking: true
+    enableIPForwarding: false
+    disableTcpStateTracking: false
+    nicType: 'Standard'
+  }
+  dependsOn: [
+    slb
+  ]
+}
+
+resource publicIpAddress_destination 'Microsoft.Network/publicIPAddresses@2022-09-01' = {
+  name: publicIpAddress_destination_name
+  location: location
+}
+
+resource vmExtension_destination 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+  parent: source_vm
+  name: 'installcustomscriptdst'
+  location: location
+  tags: {
+    displayName: 'install software for Windows VM'
+  }
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.9'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [
+        'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/destinationInitScript.ps1'
+      ]
+    }
+    protectedSettings: {
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File destinationInitScript.ps1'
+    }
+  }
+}
+
 resource source_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: source_vm_name
   location: location
@@ -158,58 +226,6 @@ resource source_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
 }
 
-resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
-  parent: source_vm
-  name: 'installcustomscript'
-  location: location
-  tags: {
-    displayName: 'install software for Windows VM'
-  }
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.9'
-    autoUpgradeMinorVersion: true
-    settings: {
-      fileUris: [
-        'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1'
-      ]
-    }
-    protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1'
-    }
-  }
-}
-
-// resource privateendpoint_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
-//   name: privateendpoint_nic_name
-//   location: location
-//   properties: {
-//     ipConfigurations: [
-//       {
-//         name: 'privateEndpointIpConfig.4cda819c-1c6a-4168-9615-a21b7c7acc8a'
-//         type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
-//         properties: {
-//           privateIPAllocationMethod: 'Static'
-//           privateIPAddress: '10.1.0.10'
-//           subnet: {
-//             id: source_vnet_subnet_default.id
-//           }
-//           primary: true
-//           privateIPAddressVersion: 'IPv4'
-//         }
-//       }
-//     ]
-//     dnsSettings: {
-//       dnsServers: []
-//     }
-//     enableAcceleratedNetworking: false
-//     enableIPForwarding: false
-//     disableTcpStateTracking: false
-//     nicType: 'Standard'
-//   }
-// }
-
 resource source_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
   name: source_nic_name
   location: location
@@ -238,17 +254,28 @@ resource source_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
   }
 }
 
-// resource privateendpoint_connection 'Microsoft.Network/privateLinkServices/privateEndpointConnections@2022-09-01' = {
-//   parent: privateLink
-//   name: 'PE.8c9ab6fd-e2a7-4b65-88a3-a2aa86705c3a'
-//   properties: {
-//     privateLinkServiceConnectionState: {
-//       status: 'Approved'
-//       description: 'Auto Approved'
-//       actionsRequired: 'None'
-//     }
-//   }
-// }
+resource vmExtension_source 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+  parent: source_vm
+  name: 'installcustomscriptsrc'
+  location: location
+  tags: {
+    displayName: 'install software for Windows VM'
+  }
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.9'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [
+        'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1'
+      ]
+    }
+    protectedSettings: {
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1'
+    }
+  }
+}
 
 resource bastion 'Microsoft.Network/bastionHosts@2022-09-01' = {
   name: bastion_name
@@ -319,14 +346,6 @@ resource slb 'Microsoft.Network/loadBalancers@2022-09-01' = {
     backendAddressPools: [
       {
         name: 'bep'
-        // properties: {
-        //   loadBalancerBackendAddresses: [
-        //     {
-        //       name: 'VFPReproRG_destinationvm724ipconfig1'
-        //       properties: {}
-        //     }
-        //   ]
-        // }
       }
     ]
     loadBalancingRules: [
@@ -334,7 +353,6 @@ resource slb 'Microsoft.Network/loadBalancers@2022-09-01' = {
         name: 'forwardAll'
         properties: {
           frontendIPConfiguration: {
-            //id: '${slb.id}/frontendIPConfigurations/fip'
             id: resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', slb_name, 'fip')
             
           }
@@ -349,11 +367,6 @@ resource slb 'Microsoft.Network/loadBalancers@2022-09-01' = {
           backendAddressPool: {
             id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', slb_name, 'bep')
           }
-          // backendAddressPools: [
-          //   {
-          //     id: slb_frontendip.id
-          //   }
-          // ]
           probe: {
             id: resourceId('Microsoft.Network/loadBalancers/probes', slb_name, 'probe10001')
           }
@@ -376,44 +389,6 @@ resource slb 'Microsoft.Network/loadBalancers@2022-09-01' = {
     outboundRules: []
     inboundNatPools: []
   }
-}
-
-
-
-resource destination_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
-  name: destination_nic_name
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: destination_vnet_subnet_default.id
-          }
-          primary: true
-          privateIPAddressVersion: 'IPv4'
-          loadBalancerBackendAddressPools: [
-            {
-              id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', slb_name, 'bep')
-            }
-          ]
-        }
-      }
-    ]
-    dnsSettings: {
-      dnsServers: []
-    }
-    enableAcceleratedNetworking: true
-    enableIPForwarding: false
-    disableTcpStateTracking: false
-    nicType: 'Standard'
-  }
-  dependsOn: [
-    slb
-  ]
 }
 
 resource privateendpoint 'Microsoft.Network/privateEndpoints@2022-09-01' = {
@@ -460,53 +435,6 @@ resource privateLink 'Microsoft.Network/privateLinkServices@2022-09-01' = {
       }
     ]
   }
-}
-
-// resource privatelink_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
-//   name: privatelink_nic_name
-//   location: location
-//   properties: {
-//     ipConfigurations: [
-//       {
-//         name: 'default-1'
-//         type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
-//         properties: {
-//           privateIPAllocationMethod: 'Dynamic'
-//           subnet: {
-//             id: destination_vnet_subnet_default.id
-//           }
-//           primary: true
-//           privateIPAddressVersion: 'IPv4'
-//         }
-//       }
-//     ]
-//     enableAcceleratedNetworking: false
-//     enableIPForwarding: false
-//     disableTcpStateTracking: false
-//     privateLinkService: {
-//       id: privateLink.id
-//     }
-//     nicType: 'Standard'
-//   }
-// }
-
-resource vnet_peering_src_to_dst 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-09-01' = {
-  parent: source_vnet
-  name: 'todst'
-  properties: {
-    remoteVirtualNetwork: {
-      id: destination_vnet.id
-    }
-    // allowVirtualNetworkAccess: true
-    // allowForwardedTraffic: true
-    // allowGatewayTransit: false
-    // useRemoteGateways: false
-    // doNotVerifyRemoteGateways: false
-    
-  }
-  dependsOn: [
-    bastion
-  ]
 }
 
 resource source_vnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
@@ -560,6 +488,19 @@ resource source_vnet_subnet_pe 'Microsoft.Network/virtualNetworks/subnets@2022-0
   ]
 }
 
+resource vnet_peering_src_to_dst 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-09-01' = {
+  parent: source_vnet
+  name: 'todst'
+  properties: {
+    remoteVirtualNetwork: {
+      id: destination_vnet.id
+    }
+  }
+  dependsOn: [
+    bastion
+  ]
+}
+
 resource destination_vnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
   name: destination_vnet_name
   location: location
@@ -591,11 +532,6 @@ resource vnet_peering_dst_to_src 'Microsoft.Network/virtualNetworks/virtualNetwo
     remoteVirtualNetwork: {
       id: source_vnet.id
     }
-    allowVirtualNetworkAccess: true
-    allowForwardedTraffic: true
-    allowGatewayTransit: false
-    useRemoteGateways: false
-    doNotVerifyRemoteGateways: false
   }
   dependsOn: [
     bastion
