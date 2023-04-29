@@ -18,10 +18,8 @@ param destination_vm_name string = 'destinationVM${iteration}'
 param destination_nic_name string = 'destinationVM_nic'
 
 param privateendpoint_name string = 'PE'
-param privateendpoint_nic_name string = 'PE_nic'
 
 param privatelink_name string = 'PL'
-param privatelink_nic_name string = 'PL_nic'
 
 param slb_name string = 'slb'
 
@@ -464,33 +462,33 @@ resource privateLink 'Microsoft.Network/privateLinkServices@2022-09-01' = {
   }
 }
 
-resource privatelink_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
-  name: privatelink_nic_name
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'default-1'
-        type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: destination_vnet_subnet_default.id
-          }
-          primary: true
-          privateIPAddressVersion: 'IPv4'
-        }
-      }
-    ]
-    enableAcceleratedNetworking: false
-    enableIPForwarding: false
-    disableTcpStateTracking: false
-    privateLinkService: {
-      id: privateLink.id
-    }
-    nicType: 'Standard'
-  }
-}
+// resource privatelink_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
+//   name: privatelink_nic_name
+//   location: location
+//   properties: {
+//     ipConfigurations: [
+//       {
+//         name: 'default-1'
+//         type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
+//         properties: {
+//           privateIPAllocationMethod: 'Dynamic'
+//           subnet: {
+//             id: destination_vnet_subnet_default.id
+//           }
+//           primary: true
+//           privateIPAddressVersion: 'IPv4'
+//         }
+//       }
+//     ]
+//     enableAcceleratedNetworking: false
+//     enableIPForwarding: false
+//     disableTcpStateTracking: false
+//     privateLinkService: {
+//       id: privateLink.id
+//     }
+//     nicType: 'Standard'
+//   }
+// }
 
 resource vnet_peering_src_to_dst 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-09-01' = {
   parent: source_vnet

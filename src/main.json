@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.1272.37030",
-      "templateHash": "13534265367586833928"
+      "templateHash": "5831121084341657222"
     }
   },
   "parameters": {
@@ -58,17 +58,9 @@
       "type": "string",
       "defaultValue": "PE"
     },
-    "privateendpoint_nic_name": {
-      "type": "string",
-      "defaultValue": "PE_nic"
-    },
     "privatelink_name": {
       "type": "string",
       "defaultValue": "PL"
-    },
-    "privatelink_nic_name": {
-      "type": "string",
-      "defaultValue": "PL_nic"
     },
     "slb_name": {
       "type": "string",
@@ -486,39 +478,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]",
         "[resourceId('Microsoft.Network/loadBalancers', parameters('slb_name'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2022-09-01",
-      "name": "[parameters('privatelink_nic_name')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "default-1",
-            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]"
-              },
-              "primary": true,
-              "privateIPAddressVersion": "IPv4"
-            }
-          }
-        ],
-        "enableAcceleratedNetworking": false,
-        "enableIPForwarding": false,
-        "disableTcpStateTracking": false,
-        "privateLinkService": {
-          "id": "[resourceId('Microsoft.Network/privateLinkServices', parameters('privatelink_name'))]"
-        },
-        "nicType": "Standard"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('destination_vnet_name'), 'default')]",
-        "[resourceId('Microsoft.Network/privateLinkServices', parameters('privatelink_name'))]"
       ]
     },
     {
