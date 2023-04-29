@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.10.61.36676",
-      "templateHash": "6198132225875598227"
+      "templateHash": "8841751159427647368"
     }
   },
   "parameters": {
@@ -187,7 +187,10 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2022-09-01",
       "name": "[parameters('publicIpAddress_destination_name')]",
-      "location": "[parameters('location')]"
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      }
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",

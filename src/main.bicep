@@ -134,6 +134,9 @@ resource destination_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
 resource publicIpAddress_destination 'Microsoft.Network/publicIPAddresses@2022-09-01' = {
   name: publicIpAddress_destination_name
   location: location
+  sku: {
+    name: 'Standard'
+  }
 }
 
 resource vmExtension_destination 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
