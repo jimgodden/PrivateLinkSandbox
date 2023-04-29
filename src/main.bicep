@@ -174,9 +174,9 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        
+        'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1'
       ]
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted Install-WindowsFeature -Name Web-Server ` '
+      commandToExecute: 'powershell.exe sourceInitScript.ps1'
     }
   }
 }

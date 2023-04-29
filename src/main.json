@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.1272.37030",
-      "templateHash": "15604517799950167290"
+      "templateHash": "7393812024801332867"
     }
   },
   "parameters": {
@@ -212,6 +212,30 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', parameters('source_nic_name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/{1}', parameters('source_vm_name'), 'installcustomscript')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "displayName": "install software for Windows VM"
+      },
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.9",
+        "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1"
+          ],
+          "commandToExecute": "powershell.exe sourceInitScript.ps1"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
       ]
     },
     {
