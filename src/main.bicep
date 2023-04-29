@@ -181,34 +181,34 @@ resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' =
   }
 }
 
-resource privateendpoint_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
-  name: privateendpoint_nic_name
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'privateEndpointIpConfig.4cda819c-1c6a-4168-9615-a21b7c7acc8a'
-        type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
-        properties: {
-          privateIPAllocationMethod: 'Static'
-          privateIPAddress: '10.1.0.10'
-          subnet: {
-            id: source_vnet_subnet_default.id
-          }
-          primary: true
-          privateIPAddressVersion: 'IPv4'
-        }
-      }
-    ]
-    dnsSettings: {
-      dnsServers: []
-    }
-    enableAcceleratedNetworking: false
-    enableIPForwarding: false
-    disableTcpStateTracking: false
-    nicType: 'Standard'
-  }
-}
+// resource privateendpoint_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
+//   name: privateendpoint_nic_name
+//   location: location
+//   properties: {
+//     ipConfigurations: [
+//       {
+//         name: 'privateEndpointIpConfig.4cda819c-1c6a-4168-9615-a21b7c7acc8a'
+//         type: 'Microsoft.Network/networkInterfaces/ipConfigurations'
+//         properties: {
+//           privateIPAllocationMethod: 'Static'
+//           privateIPAddress: '10.1.0.10'
+//           subnet: {
+//             id: source_vnet_subnet_default.id
+//           }
+//           primary: true
+//           privateIPAddressVersion: 'IPv4'
+//         }
+//       }
+//     ]
+//     dnsSettings: {
+//       dnsServers: []
+//     }
+//     enableAcceleratedNetworking: false
+//     enableIPForwarding: false
+//     disableTcpStateTracking: false
+//     nicType: 'Standard'
+//   }
+// }
 
 resource source_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
   name: source_nic_name

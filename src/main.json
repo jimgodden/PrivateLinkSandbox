@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.1272.37030",
-      "templateHash": "7393812024801332867"
+      "templateHash": "15198677634754197509"
     }
   },
   "parameters": {
@@ -236,39 +236,6 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2022-09-01",
-      "name": "[parameters('privateendpoint_nic_name')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "privateEndpointIpConfig.4cda819c-1c6a-4168-9615-a21b7c7acc8a",
-            "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "10.1.0.10",
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
-              },
-              "primary": true,
-              "privateIPAddressVersion": "IPv4"
-            }
-          }
-        ],
-        "dnsSettings": {
-          "dnsServers": []
-        },
-        "enableAcceleratedNetworking": false,
-        "enableIPForwarding": false,
-        "disableTcpStateTracking": false,
-        "nicType": "Standard"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
       ]
     },
     {
