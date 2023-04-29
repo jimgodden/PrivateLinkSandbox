@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.6.18.56646",
-      "templateHash": "16135719232535055278"
+      "version": "0.4.1272.37030",
+      "templateHash": "7873652320568982335"
     }
   },
   "parameters": {
@@ -97,7 +97,7 @@
           },
           "osDisk": {
             "osType": "Windows",
-            "name": "[format('{0}_OsDisk_1_d42911ea18c44a65beb488855faa0e57', parameters('destination_vm_name'))]",
+            "name": "[format('{0}_OsDisk_1', parameters('destination_vm_name'))]",
             "createOption": "FromImage",
             "caching": "ReadWrite",
             "managedDisk": {
@@ -106,8 +106,7 @@
             "deleteOption": "Delete",
             "diskSizeGB": 127
           },
-          "dataDisks": [],
-          "diskControllerType": "SCSI"
+          "dataDisks": []
         },
         "osProfile": {
           "computerName": "[parameters('destination_vm_name')]",
@@ -167,7 +166,7 @@
           },
           "osDisk": {
             "osType": "Windows",
-            "name": "[format('{0}_OsDisk_1_1367f1ccf4264ee789372a21344c941a', parameters('source_vm_name'))]",
+            "name": "[format('{0}_OsDisk_1', parameters('source_vm_name'))]",
             "createOption": "FromImage",
             "caching": "ReadWrite",
             "managedDisk": {
@@ -176,8 +175,7 @@
             "deleteOption": "Delete",
             "diskSizeGB": 127
           },
-          "dataDisks": [],
-          "diskControllerType": "SCSI"
+          "dataDisks": []
         },
         "osProfile": {
           "computerName": "[parameters('source_vm_name')]",
