@@ -1,3 +1,5 @@
+Import-Module WebAdministration
+
 # Define variables for the IIS website and certificate
 $siteName = "Default Web Site"
 $port = 10001
@@ -13,11 +15,8 @@ New-NetFirewallRule -DisplayName "Allow inbound TCP port 10001" -Direction Inbou
 # Install the IIS server feature
 Install-WindowsFeature -Name Web-Server -includeManagementTools
 
-# Bind the certificate to the IIS website
-# $certHashBytes = (Get-Item -Path "Cert:\LocalMachine\My\$thumbprint").GetCertHash()
-# $certHash = [System.BitConverter]::ToString($certHashBytes).Replace("-","")
-# $certStoreName = "MY"
-
 New-WebBinding -Name $siteName -Port $port -Protocol "https"
-# $binding = Get-WebBinding -Name $siteName -Protocol "https"
-# $binding.AddSslCertificate($certStoreName, $certHash)
+
+$SSLCert = Get-ChildItem –Path "cert:\LocalMachine\My" | Where-Object {$_.subject -like 'cn=localhost'}
+Set-Location "IIS:\sslbindings"
+New-Item "!10001!" -value $SSLCert 
