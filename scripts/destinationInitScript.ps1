@@ -17,6 +17,6 @@ Import-Module WebAdministration
 
 New-WebBinding -Name $siteName -Port $port -Protocol "https"
 
-$SSLCert = Get-ChildItem –Path "cert:\LocalMachine\My" | Where-Object {$_.subject -like 'cn=localhost'}
+$SSLCert = Get-ChildItem -Path "cert:\LocalMachine\My" | Where-Object {$_.subject -like 'cn=localhost'}
 Set-Location "IIS:\sslbindings"
-New-Item !10001! -value $SSLCert
+New-Item "!10001!" -value $SSLCert
