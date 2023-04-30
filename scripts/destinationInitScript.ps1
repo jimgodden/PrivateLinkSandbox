@@ -13,12 +13,10 @@ New-NetFirewallRule -DisplayName "Allow inbound TCP port 10001" -Direction Inbou
 # Install the IIS server feature
 Install-WindowsFeature -Name Web-Server -includeManagementTools
 
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-Install-Module WebAdministration -Force
 Import-Module WebAdministration
 
 New-WebBinding -Name $siteName -Port $port -Protocol "https"
 
 $SSLCert = Get-ChildItem –Path "cert:\LocalMachine\My" | Where-Object {$_.subject -like 'cn=localhost'}
 Set-Location "IIS:\sslbindings"
-New-Item "10001" -value $SSLCert
+New-Item '!10001!' -value $SSLCert
