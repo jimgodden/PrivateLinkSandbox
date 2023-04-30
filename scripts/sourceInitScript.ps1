@@ -8,3 +8,6 @@ $psCorePath = 'C:\Program Files\PowerShell\7'
 if ($envPath -notlike "*$psCorePath*") {
     [Environment]::SetEnvironmentVariable('Path', "$envPath;$psCorePath", 'Machine')
 }
+
+# Download and install the test script and place it in the c:\ drive
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceTestingScript.ps1" -OutFile "c:\sourceTestingScript.ps1"
