@@ -1,4 +1,4 @@
-param location string = resourceGroup().id
+param location string = resourceGroup().location
 param iteration string
 
 param source_vnet_name string = 'source_vnet'
