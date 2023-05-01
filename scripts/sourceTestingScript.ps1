@@ -19,9 +19,20 @@ while ($noError) {
         Write-Host "Timeout error occurred on ${date}"
         $noError = $false
 
-        Write-Host "Downloading Wireshark to capture packets and catch the next occurrance.."
-        Invoke-WebRequest -Uri https://2.na.dl.wireshark.org/win64/Wireshark-win64-4.0.5.exe -OutFile Wireshark-win64-4.0.5.exe
-        Wireshark-win64-4.0.5.exe
+        $wshell = New-Object -ComObject Wscript.Shell
+        $answer = $wshell.Popup("Do you want to download Wireshark?",0,"Alert",64+4)
+        if ($answer -eq 6) {
+            Write-Host "Downloading Wireshark to capture packets and catch the next occurrance.."
+            Invoke-WebRequest -Uri https://2.na.dl.wireshark.org/win64/Wireshark-win64-4.0.5.exe -OutFile Wireshark-win64-4.0.5.exe
+            .\Wireshark-win64-4.0.5.exe
+        }
+        elseif ($answer -eq 7) {
+            Write-Host "Good luck!"
+        }
+        else {
+            Write-Host "Unknown error.  Please download Wireshark manually if desired."
+        }
+        
     }
     #Start-Sleep -Seconds 1
 }
