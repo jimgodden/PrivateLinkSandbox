@@ -33,7 +33,7 @@ resource destination_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_D4s_v3'
+      vmSize: 'Standard_D2_v2'
     }
     storageProfile: {
       imageReference: {
