@@ -11,6 +11,8 @@ param vm_admin_username string
 @secure()
 param vm_admin_password string
 
+param hardwaresize string = 'Standard_D2_v2'
+
 param source_vm_name string = 'sourceVM${iteration}'
 param source_nic_name string = 'sourceVM_nic'
 
@@ -33,7 +35,7 @@ resource destination_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_D2_v2'
+      vmSize: hardwaresize
     }
     storageProfile: {
       imageReference: {
@@ -173,7 +175,7 @@ resource source_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   }
   properties: {
     hardwareProfile: {
-      vmSize: 'Standard_D2s_v3'
+      vmSize: hardwaresize
     }
     storageProfile: {
       imageReference: {
