@@ -20,7 +20,7 @@ while ($noError) {
         $noError = $false
 
         $wshell = New-Object -ComObject Wscript.Shell
-        $answer = $wshell.Popup("Do you want to download Wireshark?",0,"Alert",64+4)
+        $answer = $wshell.Popup("Do you want to download Wireshark?",0,"Download Option",32+4)
         if ($answer -eq 6) {
             Write-Host "Downloading Wireshark to capture packets and catch the next occurrance.."
             Invoke-WebRequest -Uri https://2.na.dl.wireshark.org/win64/Wireshark-win64-4.0.5.exe -OutFile Wireshark-win64-4.0.5.exe
