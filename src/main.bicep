@@ -1,4 +1,4 @@
-param location string = 'eastus2euap'
+param location string = resourceGroup().id
 param iteration string
 
 param source_vnet_name string = 'source_vnet'
@@ -11,7 +11,7 @@ param vm_admin_username string
 @secure()
 param vm_admin_password string
 
-param hardwaresize string = 'Standard_D2_v2'
+param hardwaresize string = 'Standard_D2s_v3'
 
 param source_vm_name string = 'sourceVM${iteration}'
 param source_nic_name string = 'sourceVM_nic'

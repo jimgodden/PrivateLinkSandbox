@@ -5,13 +5,13 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "373303527023765571"
+      "templateHash": "16242291576382494405"
     }
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus2euap"
+      "defaultValue": "[resourceGroup().id]"
     },
     "iteration": {
       "type": "string"
@@ -40,7 +40,7 @@
     },
     "hardwaresize": {
       "type": "string",
-      "defaultValue": "Standard_D2_v2"
+      "defaultValue": "Standard_D2s_v3"
     },
     "source_vm_name": {
       "type": "string",
