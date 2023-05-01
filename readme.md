@@ -7,5 +7,5 @@ You may either use the deployment.ps1 file to run this deployment with the Bicep
 Follow the steps below for testing:
 1. Connect to the sourceVM with Bastion through the Azure Portal
 2. Open a Powershell console (not Windows Powershell)
-3. Run command "cd c:\"
-4. Run command ".\sourceTestingScript.ps1"
+3. Run command "cd c:\\"
+4. Run command ".\\sourceTestingScript.ps1"
