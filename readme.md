@@ -1,6 +1,6 @@
 This project includes a simple sandbox for load testing between two Virtual Machines that are connected via a Private Link.
 
-You may either use the deployment.ps1 file to run this deployment with the Bicep template, or you can use the button below.
+You use the botton below to deploy the environment to one resource group.  Let me know if you need a script to deploy many of these environments at once.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjimgodden%2FPrivateLinkSandbox%2Fmain%2Fsrc%2Fmain.json)
 
