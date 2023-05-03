@@ -14,6 +14,9 @@ else {
     Write-Host "Unknown error.  Please download Wireshark manually if desired."
 }
 
+$errorLogFile = "c:\errorLogs.txt"
+New-Item -Type File -Path $errorLogFile
+
 
 $attempt = 0
 while ($true) {
@@ -38,6 +41,7 @@ while ($true) {
         catch [System.Exception] {
             $date = Get-Date
             Write-Host "Timeout error occurred on ${date}"
+            Add-Content -Path $errorLogFile -Value "Timeout error occurred on ${date} in ${LogFile}"
             $noError = $false
 
             # Leaving extra time for the traces to catch extra packets
