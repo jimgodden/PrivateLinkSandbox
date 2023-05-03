@@ -14,6 +14,21 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkS
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/installWireshark.ps1" -OutFile "c:\installWireshark.ps1"
 # Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/withoutNetSH.ps1" -OutFile "c:\withoutNetSH.ps1"
 
+
+# Install Windows Terminal
+Invoke-WebRequest -Uri https://aka.ms/terminal-download-win -OutFile "$env:USERPROFILE\Downloads\WindowsTerminal.msi"
+Start-Process msiexec.exe -Wait -ArgumentList "/i $env:USERPROFILE\Downloads\WindowsTerminal.msi /qn"
+
+# Set PowerShell as the default profile
+$settings = Get-Content "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_*\LocalState\settings.json" -Raw | ConvertFrom-Json
+$settings.defaultProfile = "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"
+$settings | ConvertTo-Json -Depth 50 | Set-Content "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_*\LocalState\settings.json"
+
+# Configure Windows Terminal to start automatically
+$registryPath = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
+Set-ItemProperty -Path $registryPath -Name "Windows Terminal" -Value "wt.exe"
+
+
 # $taskName = "Test Script Runner"
 # $taskDescription = "Runs sourceTestingScript.ps1 with argument '1' on login"
 # $scriptFilePath = "C:\sourceTestingScript.ps1" # Set the file path to your aaoof.ps1 file here
