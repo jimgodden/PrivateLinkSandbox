@@ -2,3 +2,4 @@ src/main.parameters.json
 src/SeperateRegions.bicep
 build.ps1
 deployment.ps1
+removeRGs.ps1
