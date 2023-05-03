@@ -14,11 +14,12 @@ param vm_admin_password string
 param hardwaresize string = 'Standard_D2s_v3'
 
 param source_vm_name string = 'sourceVM${iteration}'
-param source_nic_name string = 'sourceVM_nic'
+param source_nic_name string = '${source_vm_name}_nic'
+param publicIpAddress_source_name string = '${source_vm_name}_VIP'
 
 param destination_vm_name string = 'destinationVM${iteration}'
-param destination_nic_name string = 'destinationVM_nic'
-param publicIpAddress_destination_name string = 'destinationVM_VIP'
+param destination_nic_name string = '${destination_vm_name}_nic'
+param publicIpAddress_destination_name string = '${destination_vm_name}_VIP'
 
 param privateendpoint_name string = 'PE'
 
@@ -249,6 +250,9 @@ resource source_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
           }
           primary: true
           privateIPAddressVersion: 'IPv4'
+          publicIPAddress: {
+            id: publicIpAddress_source.id
+          }
         }
       }
     ]
@@ -282,6 +286,17 @@ resource vmExtension_source 'Microsoft.Compute/virtualMachines/extensions@2021-1
     protectedSettings: {
       commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1'
     }
+  }
+}
+
+resource publicIpAddress_source 'Microsoft.Network/publicIPAddresses@2022-09-01' = {
+  name: publicIpAddress_source_name
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
   }
 }
 
