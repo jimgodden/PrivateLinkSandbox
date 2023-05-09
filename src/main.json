@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.6.18.56646",
-      "templateHash": "16877587833453919932"
+      "templateHash": "5413595416293154514"
     }
   },
   "parameters": {
@@ -48,7 +48,11 @@
     },
     "source_nic_name": {
       "type": "string",
-      "defaultValue": "sourceVM_nic"
+      "defaultValue": "[format('{0}_nic', parameters('source_vm_name'))]"
+    },
+    "publicIpAddress_source_name": {
+      "type": "string",
+      "defaultValue": "[format('{0}_VIP', parameters('source_vm_name'))]"
     },
     "destination_vm_name": {
       "type": "string",
@@ -56,11 +60,11 @@
     },
     "destination_nic_name": {
       "type": "string",
-      "defaultValue": "destinationVM_nic"
+      "defaultValue": "[format('{0}_nic', parameters('destination_vm_name'))]"
     },
     "publicIpAddress_destination_name": {
       "type": "string",
-      "defaultValue": "destinationVM_VIP"
+      "defaultValue": "[format('{0}_VIP', parameters('destination_vm_name'))]"
     },
     "privateendpoint_name": {
       "type": "string",
@@ -73,6 +77,10 @@
     "slb_name": {
       "type": "string",
       "defaultValue": "slb"
+    },
+    "vm_ScriptFileUri": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/InitScript.ps1"
     }
   },
   "resources": [
@@ -214,7 +222,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/destinationInitScript.ps1"
+            "[parameters('vm_ScriptFileUri')]"
           ]
         },
         "protectedSettings": {
@@ -310,7 +318,10 @@
                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
               },
               "primary": true,
-              "privateIPAddressVersion": "IPv4"
+              "privateIPAddressVersion": "IPv4",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress_source_name'))]"
+              }
             }
           }
         ],
@@ -323,6 +334,7 @@
         "nicType": "Standard"
       },
       "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpAddress_source_name'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('source_vnet_name'), 'default')]"
       ]
     },
@@ -341,7 +353,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1"
+            "[parameters('vm_ScriptFileUri')]"
           ]
         },
         "protectedSettings": {
@@ -351,6 +363,18 @@
       "dependsOn": [
         "[resourceId('Microsoft.Compute/virtualMachines', parameters('source_vm_name'))]"
       ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('publicIpAddress_source_name')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
     },
     {
       "type": "Microsoft.Network/bastionHosts",
