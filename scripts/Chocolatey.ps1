@@ -1,14 +1,8 @@
-# Chocolatey installation
+# Chocolatey
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 choco install powershell-core -y
-# Add the PowerShell Core executable path to the system PATH environment variable
-$envPath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
-$psCorePath = 'C:\Program Files\PowerShell\7'
-if ($envPath -notlike "*$psCorePath*") {
-    [Environment]::SetEnvironmentVariable('Path', "$envPath;$psCorePath", 'Machine')
-}
-
+choco install microsoft-windows-terminal -y
 choco install python311 -y
 # Set the path to add
 $newPath = "C:\Python311\python.exe"
@@ -70,28 +64,36 @@ if ($currentPath -notlike "*$newPath*") {
     Write-Host "Path already exists in environment variables."
 }
 
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/installTools.ps1" -OutFile "c:\installTools.ps1"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceTestingScript.ps1" -OutFile "c:\sourceTestingScript.ps1"
 
-# Define variables for the IIS website and certificate
-$siteName = "Default Web Site"
-$port = 10001
-$certName = "MySelfSignedCert"
 
-# Create a self-signed certificate
-New-SelfSignedCertificate -DnsName "localhost" -CertStoreLocation "cert:\LocalMachine\My" `
--FriendlyName $certName
+# Set the path to add
+$newPath = "C:\PsTools\"
 
-# Open TCP port 10001 on the firewall
-New-NetFirewallRule -DisplayName "Allow inbound TCP port ${port}" -Direction Inbound -LocalPort $port -Protocol TCP -Action Allow
+# Set the scope of the environment variables to modify
+$scope = "Machine" # or "User"
 
-# Install the IIS server feature
-Install-WindowsFeature -Name Web-Server -includeManagementTools
+# Get the current path variable
+$currentPath = [Environment]::GetEnvironmentVariable("Path", $scope)
 
-Import-Module WebAdministration
+# Check if the new path is already in the variable
+if ($currentPath -notlike "*$newPath*") {
+    # Append the new path to the current path variable
+    $newPathString = "$currentPath;$newPath"
+    [Environment]::SetEnvironmentVariable("Path", $newPathString, $scope)
+    Write-Host "Path added successfully."
+} else {
+    Write-Host "Path already exists in environment variables."
+}
 
-New-WebBinding -Name $siteName -Port $port -Protocol "https"
+Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-1.75.exe" -OutFile "c:\npcap-1.75.exe"
+c:\npcap-1.75.exe
 
-$SSLCert = Get-ChildItem -Path "cert:\LocalMachine\My" | Where-Object {$_.subject -like 'cn=localhost'}
-Set-Location "IIS:\sslbindings"
-New-Item "!${port}!" -value $SSLCert
+
+Invoke-WebRequest -Uri "https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx" -OutFile "c:\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+Add-AppxPackage "c:\Microsoft.VCLibs.x64.14.00.Desktop.appx"
+
+Invoke-WebRequest -Uri "https://github.com/microsoft/terminal/releases/download/v1.16.10261.0/Microsoft.WindowsTerminal_Win10_1.16.10261.0_8wekyb3d8bbwe.msixbundle" -OutFile "c:\Microsoft.WindowsTerminal_Win10_1.16.10261.0_8wekyb3d8bbwe.msixbundle"
+Add-AppxPackage "c:\Microsoft.WindowsTerminal_Win10_1.16.10261.0_8wekyb3d8bbwe.msixbundle"
+
+
+

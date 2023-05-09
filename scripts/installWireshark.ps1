@@ -25,7 +25,7 @@ if ($answer -eq 6) {
     $answer = $wshell.Popup("Do you want to open Wireshark?",0,"Question",32+4)
     if ($answer -eq 6) {
         if ((Test-Path $wiresharkPath)){
-            .\Wireshark.exe
+            c:\Program Files\Wireshark\Wireshark.exe
         }
         else {
             Write-Host "Wait until Wireshark is done installing.  Once finished you can run `".\Wireshark.exe`" in Powershell to run the program"

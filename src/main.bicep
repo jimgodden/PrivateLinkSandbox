@@ -27,6 +27,8 @@ param privatelink_name string = 'PL'
 
 param slb_name string = 'slb'
 
+param vm_ScriptFileUri string = 'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/InitScript.ps1'
+
 
 resource destination_vm 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: destination_vm_name
@@ -159,7 +161,7 @@ resource vmExtension_destination 'Microsoft.Compute/virtualMachines/extensions@2
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/destinationInitScript.ps1'
+        vm_ScriptFileUri
       ]
     }
     protectedSettings: {
@@ -280,7 +282,7 @@ resource vmExtension_source 'Microsoft.Compute/virtualMachines/extensions@2021-1
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        'https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceInitScript.ps1'
+        vm_ScriptFileUri
       ]
     }
     protectedSettings: {

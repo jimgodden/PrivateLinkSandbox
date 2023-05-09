@@ -1,7 +1,7 @@
-# Download and install the PowerShell Core package
-Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/download/v7.2.1/PowerShell-7.2.1-win-x64.msi -OutFile PowerShell-7.2.1-win-x64.msi
-Start-Process msiexec.exe -Wait -ArgumentList '/i PowerShell-7.2.1-win-x64.msi /qn /norestart'
+# Chocolatey installation
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
+choco install powershell-core -y
 # Add the PowerShell Core executable path to the system PATH environment variable
 $envPath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
 $psCorePath = 'C:\Program Files\PowerShell\7'
@@ -9,38 +9,89 @@ if ($envPath -notlike "*$psCorePath*") {
     [Environment]::SetEnvironmentVariable('Path', "$envPath;$psCorePath", 'Machine')
 }
 
-# Download and install the test script and place it in the c:\ drive
+choco install python311 -y
+# Set the path to add
+$newPath = "C:\Python311\python.exe"
+
+# Set the scope of the environment variables to modify
+$scope = "Machine" # or "User"
+
+# Get the current path variable
+$currentPath = [Environment]::GetEnvironmentVariable("Path", $scope)
+
+# Check if the new path is already in the variable
+if ($currentPath -notlike "*$newPath*") {
+    # Append the new path to the current path variable
+    $newPathString = "$currentPath;$newPath"
+    [Environment]::SetEnvironmentVariable("Path", $newPathString, $scope)
+    Write-Host "Path added successfully."
+} else {
+    Write-Host "Path already exists in environment variables."
+}
+
+choco install vscode -y
+# Set the path to add
+$newPath = "C:\Program Files\Microsoft VS Code\code.exe"
+
+# Set the scope of the environment variables to modify
+$scope = "Machine" # or "User"
+
+# Get the current path variable
+$currentPath = [Environment]::GetEnvironmentVariable("Path", $scope)
+
+# Check if the new path is already in the variable
+if ($currentPath -notlike "*$newPath*") {
+    # Append the new path to the current path variable
+    $newPathString = "$currentPath;$newPath"
+    [Environment]::SetEnvironmentVariable("Path", $newPathString, $scope)
+    Write-Host "Path added successfully."
+} else {
+    Write-Host "Path already exists in environment variables."
+}
+
+
+choco install wireshark -y
+# Set the path to add
+$newPath = "C:\Program Files\Wireshark\Wireshark.exe"
+
+# Set the scope of the environment variables to modify
+$scope = "Machine" # or "User"
+
+# Get the current path variable
+$currentPath = [Environment]::GetEnvironmentVariable("Path", $scope)
+
+# Check if the new path is already in the variable
+if ($currentPath -notlike "*$newPath*") {
+    # Append the new path to the current path variable
+    $newPathString = "$currentPath;$newPath"
+    [Environment]::SetEnvironmentVariable("Path", $newPathString, $scope)
+    Write-Host "Path added successfully."
+} else {
+    Write-Host "Path already exists in environment variables."
+}
+
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/installTools.ps1" -OutFile "c:\installTools.ps1"
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/sourceTestingScript.ps1" -OutFile "c:\sourceTestingScript.ps1"
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/installWireshark.ps1" -OutFile "c:\installWireshark.ps1"
-# Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jimgodden/PrivateLinkSandbox/main/scripts/withoutNetSH.ps1" -OutFile "c:\withoutNetSH.ps1"
 
+# Define variables for the IIS website and certificate
+$siteName = "Default Web Site"
+$port = 10001
+$certName = "MySelfSignedCert"
 
-# Install Windows Terminal
-Invoke-WebRequest -Uri https://aka.ms/terminal-download-win -OutFile "$env:USERPROFILE\Downloads\WindowsTerminal.msi"
-Start-Process msiexec.exe -Wait -ArgumentList "/i $env:USERPROFILE\Downloads\WindowsTerminal.msi /qn"
+# Create a self-signed certificate
+New-SelfSignedCertificate -DnsName "localhost" -CertStoreLocation "cert:\LocalMachine\My" `
+-FriendlyName $certName
 
-# Set PowerShell as the default profile
-$settings = Get-Content "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_*\LocalState\settings.json" -Raw | ConvertFrom-Json
-$settings.defaultProfile = "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}"
-$settings | ConvertTo-Json -Depth 50 | Set-Content "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_*\LocalState\settings.json"
+# Open TCP port 10001 on the firewall
+New-NetFirewallRule -DisplayName "Allow inbound TCP port ${port}" -Direction Inbound -LocalPort $port -Protocol TCP -Action Allow
 
-# Configure Windows Terminal to start automatically
-$registryPath = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-Set-ItemProperty -Path $registryPath -Name "Windows Terminal" -Value "wt.exe"
+# Install the IIS server feature
+Install-WindowsFeature -Name Web-Server -includeManagementTools
 
+Import-Module WebAdministration
 
-# $taskName = "Test Script Runner"
-# $taskDescription = "Runs sourceTestingScript.ps1 with argument '1' on login"
-# $scriptFilePath = "C:\sourceTestingScript.ps1" # Set the file path to your aaoof.ps1 file here
-# $minutes = [int](Get-Date -Format "mm")
-# $futureMinutes = $minutes + 5
-# $futureTimeFull = Get-Date -Format "HH:${futureMinutes}tt"
+New-WebBinding -Name $siteName -Port $port -Protocol "https"
 
-# # Create a new Task Scheduler trigger for weekdays at 4 PM
-# $trigger = New-ScheduledTaskTrigger -Once -At $futureTimeFull
-
-# # Create a new Task Scheduler action to run PowerShell with the script and argument
-# $action = New-ScheduledTaskAction -Execute "pwsh.exe" -Argument "${scriptFilePath} 1"
-
-# # Register the task with Task Scheduler
-# Register-ScheduledTask -TaskName $taskName -Trigger $trigger -Action $action -Description $taskDescription
+$SSLCert = Get-ChildItem -Path "cert:\LocalMachine\My" | Where-Object {$_.subject -like 'cn=localhost'}
+Set-Location "IIS:\sslbindings"
+New-Item "!${port}!" -value $SSLCert
