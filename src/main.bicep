@@ -165,7 +165,7 @@ resource vmExtension_destination 'Microsoft.Compute/virtualMachines/extensions@2
       ]
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File destinationInitScript.ps1'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File InitScript.ps1'
     }
   }
 }
@@ -286,7 +286,7 @@ resource vmExtension_source 'Microsoft.Compute/virtualMachines/extensions@2021-1
       ]
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File sourceInitScript.ps1'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File InitScript.ps1'
     }
   }
 }
