@@ -1,5 +1,8 @@
 $errorLogFile = "c:\errorLogs.txt"
-New-Item -Type File -Path $errorLogFile
+
+if (!$errorLogFile){
+    New-Item -Type File -Path $errorLogFile
+}
 
 $noError = $true
 
