@@ -11,7 +11,9 @@ param vm_admin_username string
 @secure()
 param vm_admin_password string
 
-param hardwaresize string = 'Standard_D2s_v3'
+// param hardwaresize string = 'Standard_D2s_v3'
+// PG requested an AMD VM series.  using the below size
+param hardwaresize string = 'Standard_D2a_v4'
 
 param source_vm_name string = 'sourceVM${iteration}'
 param source_nic_name string = '${source_vm_name}_nic'
@@ -126,7 +128,9 @@ resource destination_nic 'Microsoft.Network/networkInterfaces@2022-09-01' = {
     dnsSettings: {
       dnsServers: []
     }
-    enableAcceleratedNetworking: true
+    // enableAcceleratedNetworking: true
+    // PG wants only the destination to not use accelnet
+    enableAcceleratedNetworking: false
     enableIPForwarding: false
     disableTcpStateTracking: false
     nicType: 'Standard'
