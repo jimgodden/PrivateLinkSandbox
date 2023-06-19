@@ -24,4 +24,5 @@ while ($noError) {
         Add-Content -Path $errorLogFile -Value "Timeout error occurred on ${date}"
         $noError = $false
     }
+    Start-Sleep -Milliseconds 3
 }

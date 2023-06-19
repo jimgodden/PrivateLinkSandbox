@@ -1,5 +1,5 @@
 # ensures that Windows PowerShell is used
-powershell.exe
+Write-Host "**This script will fail if it is ran from PowerShell Core**"
 
 # npcap for using Wireshark for taking packet captures
 Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-1.75.exe" -OutFile "c:\npcap-1.75.exe"
@@ -17,6 +17,3 @@ Add-AppxPackage "c:\Microsoft.WindowsTerminal_Win10_1.16.10261.0_8wekyb3d8bbwe.m
 # $shortcut = $shell.CreateShortcut("$env:APPDATA\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\MyApp.lnk")
 # $shortcut.TargetPath = "C:\Path\To\MyApp.exe"
 # $shortcut.Save()
-
-# Switches back to PowerShell Core
-pwsh.exe

@@ -6,13 +6,8 @@ You may use the botton below to deploy the environment to one resource group, or
 
 Follow the steps below for testing:
 1. Connect to the sourceVM with Bastion through the Azure Portal
-2. Open a Powershell console (not Windows Powershell)
-3. Run command "cd c:\\sourceTestingScript.ps1"
+2. Install npcap and Windows Terminal by running "c:\\installtools/ps1" in Windows PowerShell
+3. Open Wireshark, start the packet capture, and use the following filter "tcp.port == 10001 and ip.addr != 10.1.2.4"
+4. Open a Powershell console (not Windows Powershell) and run "cd c:\\sourceTestingScript.ps1"
 
 A PowerShell script will run that continously connects to the WebServer on the other end of the Private Endpoint.  The error is triggered when the source VM has to wait 10 seconds or more for a response to it's query.  The script will stop and output the time of the error in the console.
-
-Wireshark is already installed on the machine during the initial setup.  However, Npcap needs to be installed manually.  You can run the installer for Npcap and Windows Terminal by running the following command in PowerShell:
-
-"C:\\installTools.ps1"
-
-Note: I have this same script in the same location on the destination VM as well.

@@ -13,7 +13,7 @@ param vm_admin_password string
 
 // param hardwaresize string = 'Standard_D2s_v3'
 // PG requested an AMD VM series.  using the below size
-param hardwaresize string = 'Standard_D2a_v4'
+param hardwaresize string = 'Standard_D2s_v3'
 
 param source_vm_name string = 'sourceVM${iteration}'
 param source_nic_name string = '${source_vm_name}_nic'
